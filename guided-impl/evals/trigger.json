@@ -1,0 +1,82 @@
+[
+  {
+    "query": "ok so we've finally decided to rip out the old session-based auth in our Express+Postgres backend and move to JWT with refresh tokens. there's about 14 routes that use the current middleware and we have a mobile app, web SPA, and a third-party partner integration that all hit these endpoints. I want to think this through properly before I touch anything — what's the cleanest migration path that doesn't break the partner integration mid-flight?",
+    "should_trigger": true
+  },
+  {
+    "query": "I need to add observability to our ingest pipeline (Go, NATS, ClickHouse). right now if something goes sideways we're basically blind. want OTel traces end-to-end, prometheus metrics for queue depth + processing latency + error rate per stage, and structured logs that we can correlate by trace ID. lay this out for me before I start wiring it up",
+    "should_trigger": true
+  },
+  {
+    "query": "design me a rate-limiter for our public API. we run on 6 EC2 instances behind an ALB so it has to be cluster-aware. plan limits per API key per minute and per IP per second. we already use Redis for sessions so that's available. should fail open on Redis outage but log loudly",
+    "should_trigger": true
+  },
+  {
+    "query": "we want to migrate the user service from REST to GraphQL. existing clients are an Android app (in production), an iOS app (in production), an internal admin React panel, and 2 external partners with API keys. how would you stage this so we don't bork anyone? I'm leaning towards running both in parallel for a release cycle",
+    "should_trigger": true
+  },
+  {
+    "query": "build me a Slack bot that posts a daily 9am summary of yesterday's prod errors from our Sentry account into #eng-alerts. needs to deduplicate similar errors, link back to Sentry, and ping the on-call rotation if any critical-severity ones came in overnight. python is fine. we have a small fly.io project where we run other bots",
+    "should_trigger": true
+  },
+  {
+    "query": "I want to prototype a vector-search feature in our docs site (Next.js + Vercel). thinking about pgvector vs Pinecone vs Turbopuffer. embeddings probably from OpenAI text-embedding-3-small but I'm open. ~50k docs, refreshed nightly. budget is tight, latency target is <300ms p95. walk me through the tradeoffs and let's design it",
+    "should_trigger": true
+  },
+  {
+    "query": "we need to add audit logging across the whole payment flow for SOC2. every state change on Order, Payment, Refund needs to be captured with actor + before/after + timestamp and stored append-only. it's a Rails monolith with Postgres. don't want N+1 perf regressions. design this for me",
+    "should_trigger": true
+  },
+  {
+    "query": "I want to build a new internal skill for our claude code setup that automates our PR description format (we have a strict template). it should read the diff, fill in the sections (summary, test plan, rollback plan, risk level), and post the PR. think of it like an opinionated wrapper. design first please",
+    "should_trigger": true
+  },
+  {
+    "query": "library migration time: we're on bull 3 and we want to go to bullmq. ~40 job types across 3 services, some have custom retry/backoff logic, a few use bull's repeat-cron feature which I think bullmq does differently. plan the migration so we can do it incrementally per-service without dual-running both libraries for too long",
+    "should_trigger": true
+  },
+  {
+    "query": "rebuild our file-upload pipeline. currently: browser POSTs to our API, we stream to S3, write metadata to PG, kick off a celery task to do virus scan + thumbnail. it's flaky and slow on large files. I want presigned URLs direct to S3, S3 event -> SQS -> worker, metadata reconciled after. design and tradeoffs please before any code",
+    "should_trigger": true
+  },
+  {
+    "query": "fix this typo in the README: \"recieve\" should be \"receive\"",
+    "should_trigger": false
+  },
+  {
+    "query": "what does this function do? `func (s *Server) handleConn(c net.Conn) { defer c.Close(); io.Copy(c, c) }`",
+    "should_trigger": false
+  },
+  {
+    "query": "run the tests in pkg/auth and show me what fails",
+    "should_trigger": false
+  },
+  {
+    "query": "format this file with gofmt",
+    "should_trigger": false
+  },
+  {
+    "query": "rename `getUserById` to `fetchUserByID` across the whole repo. mechanical rename, no logic change",
+    "should_trigger": false
+  },
+  {
+    "query": "why did the CI job for PR #4421 fail? error says 'cannot find module @company/shared'",
+    "should_trigger": false
+  },
+  {
+    "query": "review this PR for me: https://github.com/acme/api/pull/812 — focus on whether the error handling is correct",
+    "should_trigger": false
+  },
+  {
+    "query": "there's a bug in pricing.ts line 84 — the discount is being applied before tax instead of after. fix it",
+    "should_trigger": false
+  },
+  {
+    "query": "change the log level on the worker from INFO to DEBUG so I can see what's happening in staging",
+    "should_trigger": false
+  },
+  {
+    "query": "update the FEATURE_X_ENABLED env var in our staging .env.staging file to true",
+    "should_trigger": false
+  }
+]

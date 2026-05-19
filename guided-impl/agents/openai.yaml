@@ -1,0 +1,4 @@
+interface:
+  display_name: "Guided Implementation"
+  short_description: "Collaborative design-first implementation"
+  default_prompt: "Use $guided-impl to plan and implement a feature collaboratively, one file at a time."

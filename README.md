@@ -50,6 +50,43 @@ Thinking-discipline practices encoded in the workflow:
   LLM Top 10 categories, plus a skill-specific scope-creep / approval-laundering
   scenario
 
+### `token-diet/`
+
+A skill that audits a model-facing document — a SKILL.md, CLAUDE.md, system
+prompt, or agent instruction file — and recommends concrete edits to lower its
+token cost without weakening what it does. Every token in these files is
+re-sent on (almost) every request, so trimming compounds.
+
+It applies a 10-point rubric across three axes:
+
+- **Context-token reduction** — right-size the doc, cut redundancy, prose →
+  tables/bullets, strip filler/hedging, minimal examples, reference instead of
+  inline, delete dead/default instructions, tighten the trigger field.
+- **Cache optimization** — stable content first, volatile last, so edits don't
+  invalidate the cached prefix (short ~5-min TTL).
+- **Output-token reduction** — make the target agent terse: diffs not whole
+  files, pipe noisy output through `grep`/`tail`, no preamble/recap, bounded
+  replies.
+
+It complements `skilllint` (which checks structure — line/char/frontmatter
+limits) rather than duplicating it, and is itself token-frugal: it reports a
+ranked summary table plus tight before→after pairs, and applies edits one at a
+time on approval.
+
+The **load-bearing guardrail** (mirroring `go-test-fix`'s "don't hollow out the
+assertion"): never cut a load-bearing instruction, trigger phrase, or safety
+clause to save tokens — brevity must not change behavior. Low-confidence cuts
+are surfaced, not applied silently.
+
+#### Files
+
+- `token-diet/SKILL.md` — the skill itself (the audit rubric + workflow)
+- `token-diet/PRACTICES.md` — the same 10 practices as CLAUDE.md-ready
+  imperative one-liners, for reuse inside instruction files (progressive
+  disclosure; not loaded at trigger time)
+- `token-diet/evals/trigger.json` — 20 prompts for trigger-accuracy testing
+  (10 should-trigger, 10 should-not-trigger)
+
 ## Installation
 
 Place a skill directory under `~/.claude/skills/`:

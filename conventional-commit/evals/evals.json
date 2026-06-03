@@ -1,0 +1,26 @@
+{
+  "skill_name": "conventional-commit",
+  "evals": [
+    {
+      "id": 0,
+      "name": "single-bugfix",
+      "prompt": "I just fixed a bug in the repo at REPO_PATH. Commit my changes.",
+      "expected_output": "A single Conventional Commit of type fix with an imperative, lowercase subject (no trailing period) and a terse body explaining WHY the change was made, not restating the diff.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "mixed-changes-split",
+      "prompt": "Commit the changes in the repo at REPO_PATH.",
+      "expected_output": "The skill notices the changes are unrelated (a new feature, a dependency bump, and a docs edit), proposes splitting them into separate atomic Conventional Commits (feat / build / docs), rather than one bundled commit.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "breaking-change",
+      "prompt": "Commit the API changes in the repo at REPO_PATH and push a PR.",
+      "expected_output": "A Conventional Commit that flags the breaking change with a ! after the type/scope AND a BREAKING CHANGE: footer describing the impact and migration.",
+      "files": []
+    }
+  ]
+}

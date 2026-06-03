@@ -1,0 +1,82 @@
+[
+  {
+    "query": "this SKILL.md is way too long and bloated, can you trim it down so it uses fewer tokens without losing what it does?",
+    "should_trigger": true
+  },
+  {
+    "query": "my CLAUDE.md keeps growing and every session feels expensive now. audit it and tell me what to cut to reduce context tokens",
+    "should_trigger": true
+  },
+  {
+    "query": "token-diet this prompt for me — it's the system prompt for an agent and I think half of it is filler",
+    "should_trigger": true
+  },
+  {
+    "query": "can you make my agent instructions more concise? there's a ton of repetition and I want it cheaper to run",
+    "should_trigger": true
+  },
+  {
+    "query": "I want to optimize this skill for prompt caching — what should I move around so edits don't keep busting the cache?",
+    "should_trigger": true
+  },
+  {
+    "query": "the agent's replies are super verbose and burning output tokens. how should I rewrite the instructions to make it terse and return diffs instead of whole files?",
+    "should_trigger": true
+  },
+  {
+    "query": "review my SKILL.md and give me before/after rewrites that shrink it but keep the triggers intact",
+    "should_trigger": true
+  },
+  {
+    "query": "why is my context window so expensive on every turn? slim down these instructions",
+    "should_trigger": true
+  },
+  {
+    "query": "here's three SKILL.md files — rank them by how token-wasteful they are and tell me what to fix in each",
+    "should_trigger": true
+  },
+  {
+    "query": "go through my Claude instructions file and strip the hedging and redundant phrasing to save tokens, but don't touch anything load-bearing",
+    "should_trigger": true
+  },
+  {
+    "query": "my Express API endpoint is returning a 500 on the /users route, can you help me debug it?",
+    "should_trigger": false
+  },
+  {
+    "query": "refactor this Python module to be cleaner and split the 800-line file into smaller ones",
+    "should_trigger": false
+  },
+  {
+    "query": "TestParseConfig is failing with a nil pointer panic, fix it",
+    "should_trigger": false
+  },
+  {
+    "query": "my LLM app is hitting the model's context limit at runtime — how do I budget tokens and truncate the conversation history in code?",
+    "should_trigger": false
+  },
+  {
+    "query": "write me a new skill that scans dependencies for CVEs",
+    "should_trigger": false
+  },
+  {
+    "query": "proofread this blog post and tighten the prose, it's too wordy",
+    "should_trigger": false
+  },
+  {
+    "query": "run skilllint on my skill and tell me if the frontmatter is valid",
+    "should_trigger": false
+  },
+  {
+    "query": "design a rate limiter for our public API that's cluster-aware across 6 instances",
+    "should_trigger": false
+  },
+  {
+    "query": "which Claude model is cheapest per token for a high-volume classification job?",
+    "should_trigger": false
+  },
+  {
+    "query": "my React component re-renders too often and feels slow, can you optimize it?",
+    "should_trigger": false
+  }
+]

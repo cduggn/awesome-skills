@@ -50,6 +50,16 @@ Thinking-discipline practices encoded in the workflow:
   LLM Top 10 categories, plus a skill-specific scope-creep / approval-laundering
   scenario
 
+## Hooks
+
+### `hooks/go-lint/`
+
+Two Claude Code hooks for Go: a `PostToolUse` hook that formats and fast-lints
+the edited file's package on every `Write`/`Edit`/`MultiEdit`, and a `Stop` hook
+that runs a full `go build` + `go vet` + `golangci-lint run ./...` CI gate when
+the agent finishes a turn. Both use the exit-2 contract to feed failures back to
+Claude for auto-fixing. See `hooks/go-lint/README.md` for install and wiring.
+
 ## Installation
 
 Place a skill directory under `~/.claude/skills/`:

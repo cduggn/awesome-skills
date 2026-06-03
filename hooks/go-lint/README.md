@@ -67,6 +67,26 @@ Wire them into `~/.claude/settings.json`:
   with. If you upgrade Go, rebuild it:
   `go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest`.
 
+## Token economy
+
+Hook `stderr` is fed straight into the agent's context, so verbose lint output
+is a direct token tax on every edit. The hooks minimise it:
+
+- `--output.text.print-issued-lines=false` — drops the source-snippet + `^`
+  caret lines golangci-lint prints under every issue (~60% fewer tokens, zero
+  info loss; `file:line:col message` is all the agent needs to fix).
+- `--output.text.colors=false` — strips ANSI escapes (pure noise when piped).
+- `--max-same-issues=2` — avoids repeating the same finding dozens of times.
+- `--new` (per-edit hook only) — reports only issues in the current change, not
+  the whole legacy package; keeps pre-existing debt out of context. Requires a
+  git repo and a prior commit to diff against. The `Stop` CI gate omits `--new`
+  on purpose — it is meant to catch everything.
+- Output is hard-capped at 30 lines with a `... +N more lines` summary, so a
+  pathological file can't flood the context window.
+
+Note: hooks govern *input* tokens (what the linter feeds back). They cannot make
+the agent's *replies* terse — that is a skill/prompt concern (see `token-diet/`).
+
 ## Notes
 
 - `--fast-only`'s first run in a package is slower (it warms the type cache);

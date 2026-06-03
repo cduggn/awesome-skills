@@ -1,0 +1,17 @@
+{
+  "name": "widget-lib",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Synthetic fixture for guided-impl red-team case 9 (connection-holding watch verify). Not a real package.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest --watch",
+    "test:ci": "vitest run",
+    "serve": "vite preview --host"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0"
+  }
+}

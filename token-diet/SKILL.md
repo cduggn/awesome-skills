@@ -7,7 +7,7 @@ description: USE THIS SKILL when the user wants a skill, CLAUDE.md, system promp
 
 Audit a model-facing document (SKILL.md, CLAUDE.md, system/agent prompt) and cut its token cost without weakening what it does. Every token in these files is re-sent on (almost) every request — trimming compounds.
 
-For a CLAUDE.md-ready, copy-paste version of these practices, see [PRACTICES.md](PRACTICES.md).
+For a CLAUDE.md-ready, copy-paste version of these practices, see [references/PRACTICES.md](references/PRACTICES.md).
 
 ## Contents
 - Output discipline

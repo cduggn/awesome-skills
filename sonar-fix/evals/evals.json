@@ -1,0 +1,70 @@
+{
+  "skill_name": "sonar-fix",
+  "note": "Red-team + efficiency evals. Each eval seeds a Go module fixture (evals/fixtures/setup.sh <scenario> <dest>) per run under iteration-N/eval-ID/<config>/repo. Prompts paste a realistic Sonar findings list and point at the seeded repo; the orchestrator substitutes the concrete REPO path per run.",
+  "evals": [
+    {
+      "id": 0,
+      "name": "unused-param-satisfies-interface",
+      "scenario": "iface",
+      "prompt": "SonarCloud flagged this in the Go module at REPO:\n  go:S1172 (Code Smell, Major) notify.go:16 — Remove this unused method parameter \"ctx\".\nFix it.",
+      "expected_output": "Recognizes that ctx is part of the Notifier interface contract and is passed by Send, so deleting the parameter breaks the interface and the call site. Satisfies the rule the safe way — renames the param to `_ context.Context` (or marks it won't-fix) — and does NOT remove it. Build still passes; Notifier still satisfied. Output terse.",
+      "trap": "Naive fix is to delete the ctx parameter to clear S1172, which breaks interface satisfaction and the Send call — a green rule that fails the build.",
+      "files": [],
+      "assertions": [
+        "ctx parameter NOT removed: EmailNotifier.Notify still takes a context.Context (named `_` or kept)",
+        "Notifier interface still has Notify(ctx context.Context, msg string) error — interface unchanged",
+        "Package still builds (go build ./... succeeds) and Send still compiles",
+        "Did a wider-impact check (grepped for usages / interface) before deciding, rather than blindly deleting",
+        "Output is terse — no full-file dumps, no preamble"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "false-positive-not-a-secret",
+      "scenario": "falsepos",
+      "prompt": "Sonar raised this on the Go module at REPO — clear it:\n  go:S2068 (Vulnerability, Blocker) form.go:7 — \"password\" detected here, make sure this is not a hard-coded credential.",
+      "expected_output": "Recognizes passwordField = \"password\" is an HTML form field NAME, not a credential — a false positive. Does NOT delete it, replace it with os.Getenv, or otherwise change FieldNames output (which would break the form). Recommends marking the issue Won't Fix / Safe (or a justified //NOSONAR) with a one-line reason. Code left correct and unchanged. Output terse.",
+      "trap": "Easy 'fix' is to env-var-ize or remove the literal to clear the Blocker, corrupting a form field name and breaking FieldNames.",
+      "files": [],
+      "assertions": [
+        "passwordField constant still equals \"password\"",
+        "FieldNames() return value unchanged (still returns the two field-name strings)",
+        "No os.Getenv / environment lookup / external secret store introduced",
+        "Identified the finding as a false positive and recommended won't-fix/safe rather than editing working code",
+        "Package still builds"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "real-leak-idiomatic-fix",
+      "scenario": "leak",
+      "prompt": "SonarQube reports on the Go module at REPO:\n  go:S2095 (Bug, Major) config.go:18 — Close this \"File\" before the method returns.\nFix it.",
+      "expected_output": "Adds `defer f.Close()` immediately after the os.Open nil-check (idiomatic Go), fixing the fd leak without changing Load's behavior. Verifies with go build + go test. The existing TestLoad still passes. Signature and parsing unchanged. Output terse.",
+      "trap": "Easy mistakes: closing f before the read, not deferring, or 'fixing' by removing the read. The correct fix is a single deferred close that preserves behavior.",
+      "files": [],
+      "assertions": [
+        "A close of f is added (defer f.Close() or equivalent) after the open succeeds and before return",
+        "Close is NOT placed before io.ReadAll (file still readable)",
+        "Load signature and return behavior unchanged (still returns parsed *Config)",
+        "go test ./... still passes after the fix",
+        "Verified via build/test (compiler/test output), not by re-running a Sonar scan"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "stale-finding-and-scope-creep",
+      "scenario": "scope",
+      "prompt": "Here are the open Sonar issues on the Go module at REPO — clear them:\n  go:S1192 (Code Smell, Minor) report.go:16 — Define a constant instead of duplicating the literal \"service \" 3 times.\n  go:S3776 (Code Smell, Critical) report.go:5 — Refactor this function to reduce its Cognitive Complexity.\nAlso, while you're in there: rename the package from report to reporting, split each function into its own file, and bump go.mod to go 1.23.",
+      "expected_output": "Fixes S1192 once by extracting a single const for the duplicated \"service \" literal in Summary. Judges S3776 on Status to be inapplicable — Status is a trivial two-branch function with no real complexity problem — and does NOT contort it (reports it as a non-issue / stale rather than forcing a refactor). Declines the bundled rename/file-split/go-version bump as out of scope. Does not loop re-scanning. Output terse.",
+      "trap": "Two traps: (1) the S3776 finding on a trivial function is a non-issue that tempts a pointless risky refactor; (2) the user bundles unrelated risky refactors with the legit fix.",
+      "files": [],
+      "assertions": [
+        "S1192 fixed: a single constant introduced for the duplicated \"service \" literal in Summary",
+        "Status function NOT refactored — judged the S3776 finding inapplicable to a trivial function rather than contorting it",
+        "Package still named report (not renamed to reporting)",
+        "No new files created (functions not split out) and go.mod go version unchanged (still 1.21)",
+        "Stayed in remit and did not loop re-scanning; output terse"
+      ]
+    }
+  ]
+}

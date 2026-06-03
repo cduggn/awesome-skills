@@ -50,6 +50,77 @@ Thinking-discipline practices encoded in the workflow:
   LLM Top 10 categories, plus a skill-specific scope-creep / approval-laundering
   scenario
 
+### `token-diet/`
+
+A skill that audits a model-facing document — a SKILL.md, CLAUDE.md, system
+prompt, or agent instruction file — and recommends concrete edits to lower its
+token cost without weakening what it does. Every token in these files is
+re-sent on (almost) every request, so trimming compounds.
+
+It applies a 10-point rubric across three axes:
+
+- **Context-token reduction** — right-size the doc, cut redundancy, prose →
+  tables/bullets, strip filler/hedging, minimal examples, reference instead of
+  inline, delete dead/default instructions, tighten the trigger field.
+- **Cache optimization** — stable content first, volatile last, so edits don't
+  invalidate the cached prefix (short ~5-min TTL).
+- **Output-token reduction** — make the target agent terse: diffs not whole
+  files, pipe noisy output through `grep`/`tail`, no preamble/recap, bounded
+  replies.
+
+It complements `skilllint` (which checks structure — line/char/frontmatter
+limits) rather than duplicating it, and is itself token-frugal: it reports a
+ranked summary table plus tight before→after pairs, and applies edits one at a
+time on approval.
+
+The **load-bearing guardrail** (mirroring `go-test-fix`'s "don't hollow out the
+assertion"): never cut a load-bearing instruction, trigger phrase, or safety
+clause to save tokens — brevity must not change behavior. Low-confidence cuts
+are surfaced, not applied silently.
+
+#### Files
+
+- `token-diet/SKILL.md` — the skill itself (the audit rubric + workflow)
+- `token-diet/references/PRACTICES.md` — the same 10 practices as
+  CLAUDE.md-ready imperative one-liners, for reuse inside instruction files
+  (progressive disclosure; not loaded at trigger time)
+- `token-diet/evals/trigger.json` — 20 prompts for trigger-accuracy testing
+  (10 should-trigger, 10 should-not-trigger)
+
+### `sonar-fix/`
+
+A skill for resolving SonarQube / SonarCloud / SonarLint findings from a pasted
+issue list or export. Go-leaning but language-agnostic. It mirrors
+`go-test-fix`'s philosophy: token-frugal, surgical, and unwilling to make a rule
+green by damaging correct code.
+
+The workflow parses the findings, then:
+
+- **Triages by value, not list order** — real bugs and vulnerabilities
+  (nil deref, unchecked error, resource leak, injection) first, then cheap
+  mechanical smells, then risky structural refactors; security hotspots are
+  treated as *review* requests, not auto-fixes.
+- **Applies Chesterton's Fence** — answers "why is this code here?" before
+  removing or rewriting it, because many smells (a defensive default, an
+  interface-satisfying parameter) are load-bearing.
+- **Checks wider-codebase impact before the edit lands** — greps for callers,
+  reflection, struct tags, and interface satisfaction before removing or
+  renaming any shared symbol, so a green rule never breaks the build or an API.
+- **Verifies by build + tests, not by re-scanning** — and stays in remit,
+  flagging bundled refactors (package renames, file splits) as out of scope
+  rather than silently executing wide-impact changes.
+
+The **anti-doom-loop guardrail**: fix each issue once across all occurrences,
+recognise when one rule's fix just trades for another, and when code is correct
+but the rule is wrong-for-context, recommend marking it won't-fix (or a
+justified `//NOSONAR`) instead of contorting readable code.
+
+#### Files
+
+- `sonar-fix/SKILL.md` — the skill itself (triage + fix workflow)
+- `sonar-fix/evals/evals.json` — 4 red-team / efficiency evals
+- `sonar-fix/evals/fixtures/setup.sh` — seeds the per-eval Go module fixtures
+
 ## Hooks
 
 ### `hooks/go-lint/`

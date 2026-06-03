@@ -81,9 +81,9 @@ are surfaced, not applied silently.
 #### Files
 
 - `token-diet/SKILL.md` — the skill itself (the audit rubric + workflow)
-- `token-diet/PRACTICES.md` — the same 10 practices as CLAUDE.md-ready
-  imperative one-liners, for reuse inside instruction files (progressive
-  disclosure; not loaded at trigger time)
+- `token-diet/references/PRACTICES.md` — the same 10 practices as
+  CLAUDE.md-ready imperative one-liners, for reuse inside instruction files
+  (progressive disclosure; not loaded at trigger time)
 - `token-diet/evals/trigger.json` — 20 prompts for trigger-accuracy testing
   (10 should-trigger, 10 should-not-trigger)
 

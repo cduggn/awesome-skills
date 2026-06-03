@@ -87,6 +87,40 @@ are surfaced, not applied silently.
 - `token-diet/evals/trigger.json` — 20 prompts for trigger-accuracy testing
   (10 should-trigger, 10 should-not-trigger)
 
+### `sonar-fix/`
+
+A skill for resolving SonarQube / SonarCloud / SonarLint findings from a pasted
+issue list or export. Go-leaning but language-agnostic. It mirrors
+`go-test-fix`'s philosophy: token-frugal, surgical, and unwilling to make a rule
+green by damaging correct code.
+
+The workflow parses the findings, then:
+
+- **Triages by value, not list order** — real bugs and vulnerabilities
+  (nil deref, unchecked error, resource leak, injection) first, then cheap
+  mechanical smells, then risky structural refactors; security hotspots are
+  treated as *review* requests, not auto-fixes.
+- **Applies Chesterton's Fence** — answers "why is this code here?" before
+  removing or rewriting it, because many smells (a defensive default, an
+  interface-satisfying parameter) are load-bearing.
+- **Checks wider-codebase impact before the edit lands** — greps for callers,
+  reflection, struct tags, and interface satisfaction before removing or
+  renaming any shared symbol, so a green rule never breaks the build or an API.
+- **Verifies by build + tests, not by re-scanning** — and stays in remit,
+  flagging bundled refactors (package renames, file splits) as out of scope
+  rather than silently executing wide-impact changes.
+
+The **anti-doom-loop guardrail**: fix each issue once across all occurrences,
+recognise when one rule's fix just trades for another, and when code is correct
+but the rule is wrong-for-context, recommend marking it won't-fix (or a
+justified `//NOSONAR`) instead of contorting readable code.
+
+#### Files
+
+- `sonar-fix/SKILL.md` — the skill itself (triage + fix workflow)
+- `sonar-fix/evals/evals.json` — 4 red-team / efficiency evals
+- `sonar-fix/evals/fixtures/setup.sh` — seeds the per-eval Go module fixtures
+
 ## Installation
 
 Place a skill directory under `~/.claude/skills/`:

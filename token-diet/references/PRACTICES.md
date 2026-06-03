@@ -1,6 +1,6 @@
 # Token-efficiency practices (instruction-author edition)
 
-Copy-paste–ready, imperative one-liners for use inside a CLAUDE.md, system prompt, or any model-facing instruction file. This is the human/author-facing companion to the audit rubric in `SKILL.md`; the rubric is the auditor's voice, this is the author's.
+Copy-paste one-liners for a CLAUDE.md, system prompt, or model-facing instruction file. Author-facing companion to the audit rubric in `SKILL.md`.
 
 ## Context-token reduction
 1. Keep always-in-context docs lean; push rarely-needed depth to referenced files and load on demand.
